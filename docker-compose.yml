@@ -1,0 +1,74 @@
+version: "3"
+services:
+  strapi:
+    container_name: strapi
+    build: .
+    image: strapi:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: postgres
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PORT: ${DATABASE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./app/config:/opt/app/config
+      - ./app:/opt/app/src
+      - ./app/public:/opt/app/public
+      #- ./package.json:/opt/package.json
+      #- ./.env:/opt/app/.env
+    ports:
+      - '${PORT}:${PORT}'
+    networks:
+      - strapi
+    depends_on:
+      - postgres
+
+  #mongo:
+  #  image: mongo:latest
+  #  container_name: mongo
+  #  platform: linux/amd64 # Para errores de plataforma en chips Apple M1
+  #  restart: unless-stopped
+  #  env_file: .env
+  #  environment:
+  #    MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+  #    MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+  #  volumes:
+  #    - mongodb-data:/data/db
+  #  ports:
+  #    - "27017:27017"
+  #  networks:
+  #    - strapi
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres-data:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - strapi
+    restart: unless-stopped
+
+
+volumes:
+    postgres-data:
+
+networks:
+  strapi:
+    name: Strapi
+    driver: bridge
