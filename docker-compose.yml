@@ -23,6 +23,7 @@ services:
       - ./app/config:/opt/app/config
       - ./app:/opt/app/src
       - ./app/public:/opt/app/public
+      #- ./app/favicon.ico:/opt/app/favicon.ico
       #- ./package.json:/opt/package.json
       #- ./.env:/opt/app/.env
     ports:
