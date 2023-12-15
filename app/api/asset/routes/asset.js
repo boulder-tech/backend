@@ -11,15 +11,27 @@ module.exports = {
             },
         },
         */
+        /*
         {
-            method: 'POST',
-            path: '/client/signup',
-            handler: 'api::client.client.signup',
+            method: 'GET',
+            path: '/asset/',
+            handler: 'api::client.client.sendEmail',
             config: {
                 auth: false,
                 policies: [],
             },
         },
+        */
+        {
+            method: 'POST',
+            path: '/asset',
+            handler: 'api::asset.asset.create',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
+        /*
         {
             method: 'PUT',
             path: '/client/verify-token/:token',
@@ -38,5 +50,6 @@ module.exports = {
                 policies: [],
             },
         },
+        */
     ],
 };

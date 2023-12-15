@@ -14,5 +14,5 @@ COPY ./app/favicon.ico .
 #RUN mkdir -p public/uploads
 #RUN npm install react@^18.0.0 react-dom@^18.0.0 react-router-dom@^5.2.0 styled-components@^5.2.1
 RUN npm run build
-EXPOSE 1337
+EXPOSE 80
 CMD ["npm", "run", "develop"]
