@@ -29,8 +29,9 @@ module.exports = createCoreController("api::asset.asset", ({ strapi }) => ({
         where: {
           name,
           createdAt: {
-            $gte: pastDate.toISOString(), // Filtrar por fechas mayores o iguales a hace 24 horas
-            $lte: currentDate.toISOString(), // Filtrar por fechas menores o iguales a la fecha actual
+            // $gte: pastDate.toISOString(), // Filtrar por fechas mayores o iguales a hace 24 horas
+            // $lte: currentDate.toISOString(), // Filtrar por fechas menores o iguales a la fecha actual
+            $lte: pastDate.toISOString(), // Filtrar por fechas menores o iguales a la fecha de hace 24 h
           },
         },
         orderBy: { createdAt: "desc" },
