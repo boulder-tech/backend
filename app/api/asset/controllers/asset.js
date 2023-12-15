@@ -40,7 +40,7 @@ module.exports = createCoreController("api::asset.asset", ({ strapi }) => ({
     return ctx.send({
       price,
       price_24h,
-      last_24h: price_24h !== undefined ? price_24h - price : null,
+      last_24h: price_24h !== undefined ? price - price_24h : null,
     });
   },
 }));
