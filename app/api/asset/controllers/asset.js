@@ -13,6 +13,7 @@ module.exports = createCoreController("api::asset.asset", ({ strapi }) => ({
     const { price } = await strapi.db.query("api::asset.asset").findOne({
       select: ["price"],
       where: { name },
+      orderBy: { createdAt: "desc" },
     });
 
     return ctx.send({
