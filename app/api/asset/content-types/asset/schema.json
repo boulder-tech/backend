@@ -4,7 +4,8 @@
   "info": {
     "singularName": "asset",
     "pluralName": "assets",
-    "displayName": "Asset"
+    "displayName": "Asset",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -15,6 +16,9 @@
     },
     "price": {
       "type": "float"
+    },
+    "resolution": {
+      "type": "string"
     }
   }
 }
