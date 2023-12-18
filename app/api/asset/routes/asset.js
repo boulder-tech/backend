@@ -49,6 +49,15 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "POST",
+      path: "/asset/savePriceDiffRes",
+      handler: "api::asset.asset.savePriceDiffRes",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
     /*
         {
             method: 'PUT',
