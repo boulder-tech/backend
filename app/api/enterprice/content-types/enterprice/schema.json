@@ -1,0 +1,17 @@
+{
+  "kind": "collectionType",
+  "collectionName": "enterprices",
+  "info": {
+    "singularName": "enterprice",
+    "pluralName": "enterprices",
+    "displayName": "enterprice"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    }
+  }
+}

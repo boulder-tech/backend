@@ -38,5 +38,32 @@ module.exports = {
                 policies: [],
             },
         },
+        {
+            method: 'POST',
+            path: '/client/connect-wallet',
+            handler: 'api::client.client.connectWallet',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
+        {
+            method: 'PUT',
+            path: '/client/kyc',
+            handler: 'api::client.client.KYC',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
+        {
+            method: 'GET',
+            path: '/client/public-address/:address',
+            handler: 'api::client.client.getByPublicAddress',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
     ],
 };

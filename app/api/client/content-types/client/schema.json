@@ -23,10 +23,22 @@
     "email": {
       "type": "email"
     },
-    "password": {
-      "type": "password"
+    "postal_address": {
+      "type": "string"
     },
-    "public_address": {
+    "passport": {
+      "type": "string"
+    },
+    "amount_to_invest": {
+      "type": "decimal"
+    },
+    "public_addresses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::public-address.public-address",
+      "mappedBy": "client"
+    },
+    "status": {
       "type": "string"
     }
   }

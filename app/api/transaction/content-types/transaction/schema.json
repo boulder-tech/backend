@@ -1,0 +1,39 @@
+{
+    "kind": "collectionType",
+    "collectionName": "transactions",
+    "info": {
+        "singularName": "transaction",
+        "pluralName": "transactions",
+        "displayName": "Transaction"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "client_id": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::client.client"
+        },
+        "amount": {
+            "type": "decimal"
+        },
+        "asset": {
+            "type": "string"
+        },
+        "address": {
+            "type": "string"
+        },
+        "hash": {
+            "type": "string",
+            "required": true,
+            "unique": true
+        },
+        "status": {
+            "type": "string"
+        },
+        "currency": {
+            "type": "string"
+        }
+    }
+}

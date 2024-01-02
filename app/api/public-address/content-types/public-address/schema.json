@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "public_addresses",
+  "info": {
+    "singularName": "public-address",
+    "pluralName": "public-addresses",
+    "displayName": "PublicAddress",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::client.client",
+      "inversedBy": "public_addresses"
+    },
+    "address": {
+      "type": "string"
+    }
+  }
+}

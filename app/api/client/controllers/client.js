@@ -146,4 +146,82 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
             success: true,
         });
     },
+    async connectWallet(ctx) {
+        const { public_address: address } = ctx.request.body;
+
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({ select: [], where: { address } });
+
+        if (existingAddress) {
+            return ctx.send({
+                success: false,
+            });
+        }
+
+        const { id } = await strapi.db.query('api::client.client').create({
+            data: { status: 'created' },
+        });
+
+        await strapi.db.query('api::public-address.public-address').create({
+            data: { client: id, address },
+        });
+
+        return ctx.send({
+            success: true,
+        });
+    },
+    async KYC(ctx) {
+        const { public_address: address, ...data } = ctx.request.body;
+
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address },
+                populate: { client: true },
+            });
+
+        if (existingAddress) {
+            console.log(existingAddress.client);
+            await strapi.db.query('api::client.client').update({
+                where: { id: existingAddress.client.id },
+                data: { status: 'pending_review', ...data },
+            });
+
+            return ctx.send({
+                success: true,
+            });
+        }
+    },
+    async getByPublicAddress(ctx) {
+        const { address } = ctx.params;
+
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address },
+                populate: { client: true },
+            });
+
+        if (existingAddress) {
+           const {
+                address: public_address,
+                client: { id, createdAt, updatedAt, ...clientData },
+            } =  existingAddress;
+
+
+            return ctx.send({
+                public_address,
+                client: clientData,
+                success: true,
+            });
+        } else {
+            return ctx.send(
+                {
+                    success: false,
+                },
+                404
+            );
+        }
+    },
 }));
