@@ -1,39 +1,43 @@
 {
-    "kind": "collectionType",
-    "collectionName": "transactions",
-    "info": {
-        "singularName": "transaction",
-        "pluralName": "transactions",
-        "displayName": "Transaction"
+  "kind": "collectionType",
+  "collectionName": "transactions",
+  "info": {
+    "singularName": "transaction",
+    "pluralName": "transactions",
+    "displayName": "Transaction",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "client_id": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::client.client"
     },
-    "options": {
-        "draftAndPublish": true
+    "amount_stable": {
+      "type": "decimal"
     },
-    "attributes": {
-        "client_id": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "api::client.client"
-        },
-        "amount": {
-            "type": "decimal"
-        },
-        "asset": {
-            "type": "string"
-        },
-        "address": {
-            "type": "string"
-        },
-        "hash": {
-            "type": "string",
-            "required": true,
-            "unique": true
-        },
-        "status": {
-            "type": "string"
-        },
-        "currency": {
-            "type": "string"
-        }
+    "token": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "hash": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "string"
+    },
+    "type_stable": {
+      "type": "string"
+    },
+    "token_minted": {
+      "type": "integer"
     }
+  }
 }
