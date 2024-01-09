@@ -30,6 +30,11 @@
       "required": true,
       "unique": true
     },
+    "hash_mint": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
     "status": {
       "type": "string"
     },
@@ -38,6 +43,9 @@
     },
     "token_minted": {
       "type": "integer"
+    },
+    "change": {
+      "type": "float"
     }
   }
 }
