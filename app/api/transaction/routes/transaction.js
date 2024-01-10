@@ -3,7 +3,7 @@ module.exports = {
     {
       method: "POST",
       path: "/transaction",
-      handler: "api::transaction.transaction.startTransaction", //create',
+      handler: "api::transaction.transaction.startTransaction",
       config: {
         auth: false,
         policies: [],
@@ -12,7 +12,7 @@ module.exports = {
     {
       method: "PUT",
       path: "/transaction",
-      handler: "api::transaction.transaction.endTransaction", //create',
+      handler: "api::transaction.transaction.endTransaction",
       config: {
         auth: false,
         policies: [],
