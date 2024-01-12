@@ -18,5 +18,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/transaction/:address",
+      handler: "api::transaction.transaction.allTransactions",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

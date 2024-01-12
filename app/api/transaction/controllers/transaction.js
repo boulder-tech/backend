@@ -60,5 +60,36 @@ module.exports = createCoreController(
         success: true,
       });
     },
+    async allTransactions(ctx) {
+      try {
+        const { address } = ctx.params;
+
+        const client = await this.getByPublicAddress(address);
+
+        if (!client) {
+          return ctx.send({
+            success: false,
+            message: "Client not found on db",
+          });
+        }
+
+        const transactions = await strapi.db
+          .query("api::transaction.transaction")
+          .findMany({
+            client: client.id,
+          });
+
+        return ctx.send({
+          success: true,
+          transactions,
+        });
+      } catch (error) {
+        console.error(error);
+        return ctx.send({
+          success: false,
+          message: "Error occurred when getting all transactions.",
+        });
+      }
+    },
   })
 );
