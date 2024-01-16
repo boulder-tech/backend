@@ -84,7 +84,7 @@ module.exports = {
       },
     },
     {
-      method: "GET",
+      method: "POST",
       path: "/client/kyc/withPersonaStatus",
       handler: "api::client.client.withPersonaStatus",
       config: {
