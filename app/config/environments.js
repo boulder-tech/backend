@@ -8,4 +8,7 @@ module.exports = ({ env }) => ({
         region: env('AWS_REGION'),
     },
     frontendURL: env('FRONTEND_URL'),
+    personaApiKey: env('PERSONA_API_KEY_SANDBOX'),
+    personaApiURL: env('PERSONA_API_URL'),
+    personaInquiryTemplateId: env('PERSONA_INQUIRY_TEMPLATE_ID')
 });
