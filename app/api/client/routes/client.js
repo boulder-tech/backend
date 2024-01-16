@@ -1,16 +1,5 @@
 module.exports = {
     routes: [
-        /*
-        {
-            method: 'POST',
-            path: '/client/signup',
-            handler: 'api::client.client.create',
-            config: {
-                auth: false,
-                policies: [],
-            },
-        },
-        */
         {
             method: 'POST',
             path: '/client/signup',
