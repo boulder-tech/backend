@@ -6,6 +6,7 @@
 
 const AWS = require('aws-sdk');
 const bcrypt = require('bcryptjs');
+const web3 = require('web3');
 const Persona = require('../../../services/Persona');
 
 const {
@@ -24,6 +25,7 @@ const aws_ses_email = strapi.config.get('environments.aws.ses.email', '');
 const region = strapi.config.get('environments.aws.region', '');
 const frontendURL = strapi.config.get('environments.frontendURL');
 const personaApiKey = strapi.config.get('environments.personaApiKey');
+const environment = strapi.config.get('environments.environment');
 
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -307,19 +309,36 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
             console.log(`INQUIRY ${inquiryId} STARTED`);
         } else if (name === 'inquiry.completed') {
             console.log(`INQUIRY ${inquiryId} COMPLETED`);
+            console.log(`environment`, environment);
+
             await this.updateClient({
-                address: attributes.referenceId,
+                address:
+                    environment === 'development'
+                        ? web3.utils.toChecksumAddress(attributes.referenceId)
+                        : attributes.referenceId,
                 status: 'pending_review',
             });
         } else if (name === 'inquiry.approved') {
             console.log(`INQUIRY ${inquiryId} APPROVED`);
+            console.log(`environment`, environment);
             //Just for sandbox: 10 seconds before update client status to approved because it happens too fast at sandbox environment
             await delay(10000);
 
+            //TODO: whitelist user
+
+            const address =
+                environment === 'development'
+                    ? web3.utils.toChecksumAddress(attributes.referenceId)
+                    : attributes.referenceId;
+
             await this.updateClient({
-                address: attributes.referenceId,
+                address,
                 status: 'approved',
             });
+
+            strapi.io.sockets
+                .in(address)
+                .emit('kyc-approved', { address, status: 'approved' });
         } else {
             console.log(`INQUIRY ${inquiryId}: ANOTHER ONE BITES THE DUST`);
         }
