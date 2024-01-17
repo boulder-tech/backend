@@ -1,78 +1,82 @@
-"use strict";
+'use strict';
 
 /**
  * client controller
  */
 
-const AWS = require("aws-sdk");
-const bcrypt = require("bcryptjs");
-const Persona = require("../../../services/Persona");
+const AWS = require('aws-sdk');
+const bcrypt = require('bcryptjs');
+const Persona = require('../../../services/Persona');
 
 const {
-  generateRegistrationToken,
-  verifyRegistrationToken,
-} = require("../../../utils/auth");
+    generateRegistrationToken,
+    verifyRegistrationToken,
+} = require('../../../utils/auth');
 
-const { createCoreController } = require("@strapi/strapi").factories;
+const { createCoreController } = require('@strapi/strapi').factories;
 
-const accessKeyId = strapi.config.get("environments.aws.ses.accessKeyId", "");
+const accessKeyId = strapi.config.get('environments.aws.ses.accessKeyId', '');
 const secretAccessKey = strapi.config.get(
-  "environments.aws.ses.secretAccessKey",
-  ""
+    'environments.aws.ses.secretAccessKey',
+    ''
 );
-const aws_ses_email = strapi.config.get("environments.aws.ses.email", "");
-const region = strapi.config.get("environments.aws.region", "");
-const frontendURL = strapi.config.get("environments.frontendURL");
-const personaApiKey = strapi.config.get("environments.personaApiKey");
+const aws_ses_email = strapi.config.get('environments.aws.ses.email', '');
+const region = strapi.config.get('environments.aws.region', '');
+const frontendURL = strapi.config.get('environments.frontendURL');
+const personaApiKey = strapi.config.get('environments.personaApiKey');
 
-module.exports = createCoreController("api::client.client", ({ strapi }) => ({
-  async signup(ctx) {
-    const { email, name, lastname, password, verified } = ctx.request.body;
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-    const client = await strapi.db.query("api::client.client").findOne({
-      select: [],
-      where: { email },
-      //populate: { category: true },
-    });
+module.exports = createCoreController('api::client.client', ({ strapi }) => ({
+    async signup(ctx) {
+        const { email, name, lastname, password, verified } = ctx.request.body;
 
-    if (client) {
-      return ctx.send({
-        code: 100,
-        success: true,
-      });
-    } else {
-      if (verified) {
-        await strapi.db.query("api::client.client").create({
-          data: {
-            email,
-            name,
-            lastname,
-            password: await bcrypt.hash(password, 10),
-          },
+        const client = await strapi.db.query('api::client.client').findOne({
+            select: [],
+            where: { email },
+            //populate: { category: true },
         });
 
-        return ctx.send({
-          code: 102,
-          success: true,
-        });
-      } else {
-        AWS.config.update({
-          accessKeyId,
-          secretAccessKey,
-          region,
-        });
+        if (client) {
+            return ctx.send({
+                code: 100,
+                success: true,
+            });
+        } else {
+            if (verified) {
+                await strapi.db.query('api::client.client').create({
+                    data: {
+                        email,
+                        name,
+                        lastname,
+                        password: await bcrypt.hash(password, 10),
+                    },
+                });
 
-        const ses = new AWS.SES();
-        const token = generateRegistrationToken(email);
+                return ctx.send({
+                    code: 102,
+                    success: true,
+                });
+            } else {
+                AWS.config.update({
+                    accessKeyId,
+                    secretAccessKey,
+                    region,
+                });
 
-        const params = {
-          Destination: {
-            ToAddresses: [email],
-          },
-          Message: {
-            Body: {
-              Html: {
-                Data: `<p>Hello,</p>
+                const ses = new AWS.SES();
+                const token = generateRegistrationToken(email);
+
+                const params = {
+                    Destination: {
+                        ToAddresses: [email],
+                    },
+                    Message: {
+                        Body: {
+                            Html: {
+                                Data: `<p>Hello,</p>
                 
                                 <p>Thank you for your interest in our platform! To get started, please register by clicking on the following link:</p>
                                
@@ -83,215 +87,264 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
                                 <p>Best regards,<br>
                                 Boulder Tech</p>
                                 `,
-              },
-            },
-            Subject: {
-              Data: "Welcome to Boulder Tech",
-            },
-          },
-          Source: aws_ses_email,
-        };
+                            },
+                        },
+                        Subject: {
+                            Data: 'Welcome to Boulder Tech',
+                        },
+                    },
+                    Source: aws_ses_email,
+                };
 
-        ses.sendEmail(params, (err, data) => {
-          if (err) {
-            console.error(
-              "Error al enviar el correo electrónico:",
-              err.message
+                ses.sendEmail(params, (err, data) => {
+                    if (err) {
+                        console.error(
+                            'Error al enviar el correo electrónico:',
+                            err.message
+                        );
+                    } else {
+                        console.log(
+                            'Correo electrónico enviado. ID del mensaje:',
+                            data.MessageId
+                        );
+                    }
+                });
+
+                return ctx.send({
+                    code: 101,
+                    success: true,
+                });
+            }
+        }
+    },
+    async login(ctx) {
+        const { email, password } = ctx.request.body;
+
+        const client = await strapi.db.query('api::client.client').findOne({
+            select: [],
+            where: { email },
+        });
+
+        const correctPassword = await bcrypt.compare(password, client.password);
+
+        delete client.password;
+
+        if (!correctPassword)
+            return ctx.send(
+                {
+                    code: 103,
+                    success: false,
+                },
+                401
             );
-          } else {
-            console.log(
-              "Correo electrónico enviado. ID del mensaje:",
-              data.MessageId
-            );
-          }
+
+        return ctx.send({
+            client,
+            success: true,
+        });
+    },
+    async verifyToken(ctx) {
+        const { token } = ctx.params;
+        const { email } = verifyRegistrationToken(token);
+
+        return ctx.send({
+            email: email,
+            success: true,
+        });
+    },
+    async connectWallet(ctx) {
+        const { public_address: address } = ctx.request.body;
+
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({ select: [], where: { address } });
+
+        if (existingAddress) {
+            return ctx.send({
+                success: false,
+            });
+        }
+
+        const { id } = await strapi.db.query('api::client.client').create({
+            data: { status: 'created' },
+        });
+
+        await strapi.db.query('api::public-address.public-address').create({
+            data: { client: id, address },
         });
 
         return ctx.send({
-          code: 101,
-          success: true,
+            success: true,
         });
-      }
-    }
-  },
-  async login(ctx) {
-    const { email, password } = ctx.request.body;
+    },
+    async KYC(ctx) {
+        const { public_address: address, ...data } = ctx.request.body;
 
-    const client = await strapi.db.query("api::client.client").findOne({
-      select: [],
-      where: { email },
-    });
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address },
+                populate: { client: true },
+            });
 
-    const correctPassword = await bcrypt.compare(password, client.password);
+        if (existingAddress) {
+            console.log(existingAddress.client);
+            await strapi.db.query('api::client.client').update({
+                where: { id: existingAddress.client.id },
+                data: { status: 'pending_review', ...data },
+            });
 
-    delete client.password;
+            return ctx.send({
+                success: true,
+            });
+        }
+    },
+    async updateData(ctx) {
+        const { address: main_address, ...data } = ctx.request.body;
 
-    if (!correctPassword)
-      return ctx.send(
-        {
-          code: 103,
-          success: false,
-        },
-        401
-      );
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address: main_address },
+                populate: { client: true },
+            });
 
-    return ctx.send({
-      client,
-      success: true,
-    });
-  },
-  async verifyToken(ctx) {
-    const { token } = ctx.params;
-    const { email } = verifyRegistrationToken(token);
+        const reviewStatus = data.status;
 
-    return ctx.send({
-      email: email,
-      success: true,
-    });
-  },
-  async connectWallet(ctx) {
-    const { public_address: address } = ctx.request.body;
+        if (existingAddress) {
+            await strapi.db.query('api::client.client').update({
+                where: { id: existingAddress.client.id },
+                data,
+            });
+        }
 
-    const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
-      .findOne({ select: [], where: { address } });
+        return ctx.send({
+            success: true,
+        });
+    },
+    async getByPublicAddress(ctx) {
+        const { address } = ctx.params;
 
-    if (existingAddress) {
-      return ctx.send({
-        success: false,
-      });
-    }
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address },
+                populate: { client: true },
+            });
 
-    const { id } = await strapi.db.query("api::client.client").create({
-      data: { status: "created" },
-    });
+        if (existingAddress) {
+            const {
+                address: public_address,
+                client: { id, createdAt, updatedAt, ...clientData },
+            } = existingAddress;
 
-    await strapi.db.query("api::public-address.public-address").create({
-      data: { client: id, address },
-    });
+            return ctx.send({
+                public_address,
+                client: clientData,
+                success: true,
+            });
+        } else {
+            return ctx.send(
+                {
+                    success: false,
+                },
+                404
+            );
+        }
+    },
+    async generateOneTimeLinkForKyc(ctx) {
+        const { public_address } = ctx.request.body;
+        const templateId = strapi.config.get(
+            'environments.personaInquiryTemplateId'
+        );
+        const persona = new Persona({ apiKey: personaApiKey });
 
-    return ctx.send({
-      success: true,
-    });
-  },
-  async KYC(ctx) {
-    const { public_address: address, ...data } = ctx.request.body;
+        const data = {
+            attributes: {
+                'inquiry-template-id': templateId,
+            },
+        };
 
-    const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
-      .findOne({
-        where: { address },
-        populate: { client: true },
-      });
+        const meta = {
+            'auto-create-account': true,
+            'auto-create-account-reference-id': public_address,
+        };
 
-    if (existingAddress) {
-      console.log(existingAddress.client);
-      await strapi.db.query("api::client.client").update({
-        where: { id: existingAddress.client.id },
-        data: { status: "pending_review", ...data },
-      });
+        const {
+            data: { id: inquiryId },
+        } = await persona.createInquiry({
+            data,
+            meta,
+        });
 
-      return ctx.send({
-        success: true,
-      });
-    }
-  },
-  async updateData(ctx) {
-    const { address: main_address, ...data } = ctx.request.body;
+        console.log('inquiryId', inquiryId);
 
-    const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
-      .findOne({
-        where: { address: main_address },
-        populate: { client: true },
-      });
+        const { meta: kyc } = await persona.generateOneTimeInquiryLink({
+            inquiryId,
+            meta: {},
+        });
 
-    const reviewStatus = data.status;
+        return ctx.send({
+            kyc,
+            success: true,
+        });
+    },
+    async withPersonaStatus(ctx) {
+        const {
+            data: {
+                attributes: {
+                    name,
+                    payload: {
+                        data: { id: inquiryId, attributes },
+                    },
+                },
+            },
+        } = ctx.request.body;
 
-    if (existingAddress) {
-      await strapi.db.query("api::client.client").update({
-        where: { id: existingAddress.client.id },
-        data,
-      });
-    }
+        console.log('INQUIRY NAME', name);
 
-    return ctx.send({
-      success: true,
-    });
-  },
-  async getByPublicAddress(ctx) {
-    const { address } = ctx.params;
+        if (name === 'inquiry.started') {
+            console.log(`INQUIRY ${inquiryId} STARTED`);
+        } else if (name === 'inquiry.completed') {
+            console.log(`INQUIRY ${inquiryId} COMPLETED`);
+            await this.updateClient({
+                address: attributes.referenceId,
+                status: 'pending_review',
+            });
+        } else if (name === 'inquiry.approved') {
+            console.log(`INQUIRY ${inquiryId} APPROVED`);
+            //Just for sandbox: 10 seconds before update client status to approved because it happens too fast at sandbox environment
+            await delay(10000);
 
-    const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
-      .findOne({
-        where: { address },
-        populate: { client: true },
-      });
+            await this.updateClient({
+                address: attributes.referenceId,
+                status: 'approved',
+            });
+        } else {
+            console.log(`INQUIRY ${inquiryId}: ANOTHER ONE BITES THE DUST`);
+        }
 
-    if (existingAddress) {
-      const {
-        address: public_address,
-        client: { id, createdAt, updatedAt, ...clientData },
-      } = existingAddress;
+        console.log('ATTRIBUTES', JSON.stringify(attributes));
 
-      return ctx.send({
-        public_address,
-        client: clientData,
-        success: true,
-      });
-    } else {
-      return ctx.send(
-        {
-          success: false,
-        },
-        404
-      );
-    }
-  },
-  async generateOneTimeLinkForKyc(ctx) {
-    const { public_address } = ctx.request.body;
-    const templateId = strapi.config.get(
-      "environments.personaInquiryTemplateId"
-    );
-    const persona = new Persona({ apiKey: personaApiKey });
+        return ctx.send({
+            success: true,
+        });
+    },
+    async updateClient(clientData) {
+        const { address, ...data } = clientData;
 
-    const data = {
-      attributes: {
-        "inquiry-template-id": templateId,
-      },
-    };
+        const existingAddress = await strapi.db
+            .query('api::public-address.public-address')
+            .findOne({
+                where: { address },
+                populate: { client: true },
+            });
 
-    const meta = {
-      "auto-create-account": true,
-      "auto-create-account-reference-id": public_address,
-    };
-
-    const {
-      data: { id: inquiryId },
-    } = await persona.createInquiry({
-      data,
-      meta,
-    });
-
-    console.log("inquiryId", inquiryId);
-
-    const { meta: kyc } = await persona.generateOneTimeInquiryLink({
-      inquiryId,
-      meta: {},
-    });
-
-    return ctx.send({
-      kyc,
-      success: true,
-    });
-  },
-  async withPersonaStatus(ctx) {
-    const { data } = ctx.request.body;
-
-    console.log(JSON.stringify(data));
-
-    return ctx.send({
-      success: true,
-    });
-  },
+        if (existingAddress) {
+            await strapi.db.query('api::client.client').update({
+                where: { id: existingAddress.client.id },
+                data,
+            });
+        }
+    },
 }));
