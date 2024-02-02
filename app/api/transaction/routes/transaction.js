@@ -27,5 +27,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/transaction/:token/all",
+      handler: "api::transaction.transaction.transactions",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

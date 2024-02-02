@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tokens",
+  "info": {
+    "singularName": "token",
+    "pluralName": "tokens",
+    "displayName": "Token",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "contracts": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::contract.contract",
+      "mappedBy": "tokens"
+    }
+  }
+}

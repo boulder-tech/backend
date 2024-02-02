@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contracts",
+  "info": {
+    "singularName": "contract",
+    "pluralName": "contracts",
+    "displayName": "Contract",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "address": {
+      "type": "string"
+    },
+    "tokens": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::token.token",
+      "inversedBy": "contracts"
+    },
+    "name": {
+      "type": "string"
+    }
+  }
+}

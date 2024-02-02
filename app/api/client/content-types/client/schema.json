@@ -40,6 +40,9 @@
     },
     "status": {
       "type": "string"
+    },
+    "kyc_url": {
+      "type": "string"
     }
   }
 }

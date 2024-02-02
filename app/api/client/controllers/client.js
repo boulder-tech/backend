@@ -167,8 +167,10 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
             });
         }
 
+        const kyc = await this.createOneTimeLinkForKyc(address);
+
         const { id } = await strapi.db.query('api::client.client').create({
-            data: { status: 'created' },
+            data: { status: 'created', kyc_url: kyc['one-time-link-short'] },
         });
 
         await strapi.db.query('api::public-address.public-address').create({
@@ -176,6 +178,7 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
         });
 
         return ctx.send({
+            kyc_url: kyc['one-time-link-short'],
             success: true,
         });
     },
@@ -291,6 +294,39 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
             success: true,
         });
     },
+    async createOneTimeLinkForKyc(public_address) {
+        const templateId = strapi.config.get(
+            'environments.personaInquiryTemplateId'
+        );
+        const persona = new Persona({ apiKey: personaApiKey });
+
+        const data = {
+            attributes: {
+                'inquiry-template-id': templateId,
+            },
+        };
+
+        console.log('CREATING INQUIRY WITH REFERENCE ID', public_address);
+
+        const meta = {
+            'auto-create-account': true,
+            'auto-create-account-reference-id': public_address,
+        };
+
+        const {
+            data: { id: inquiryId },
+        } = await persona.createInquiry({
+            data,
+            meta,
+        });
+
+        const { meta: kyc } = await persona.generateOneTimeInquiryLink({
+            inquiryId,
+            meta: {},
+        });
+
+        return kyc;
+    },
     async withPersonaStatus(ctx) {
         const {
             data: {
@@ -339,6 +375,27 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
             strapi.io.sockets
                 .in(address)
                 .emit('kyc-approved', { address, status: 'approved' });
+        } else if (name === 'inquiry.expired') {
+            console.log(
+                `INQUIRY ${inquiryId} EXPIRED: ANOTHER ONE BITES THE DUST`
+            );
+
+            const kyc = await this.createOneTimeLinkForKyc(address);
+
+            const address =
+                environment === 'development'
+                    ? web3.utils.toChecksumAddress(attributes.referenceId)
+                    : attributes.referenceId;
+
+            await this.updateClient({
+                address,
+                kyc_url: kyc['one-time-link-short'],
+                status: 'created',
+            });
+
+            strapi.io.sockets
+                .in(address)
+                .emit('kyc-expired', { address, status: 'expired' });
         } else {
             console.log(`INQUIRY ${inquiryId}: ANOTHER ONE BITES THE DUST`);
         }

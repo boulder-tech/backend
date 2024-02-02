@@ -96,5 +96,27 @@ module.exports = createCoreController(
                 });
             }
         },
+        async transactions(ctx) {
+            try {
+                const { token } = ctx.params;
+
+                const transactions = await strapi.db
+                    .query('api::transaction.transaction')
+                    .findMany({
+                        where: { token },
+                    });
+
+                return ctx.send({
+                    success: true,
+                    transactions,
+                });
+            } catch (error) {
+                console.error(error);
+                return ctx.send({
+                    success: false,
+                    message: 'Error occurred when getting all transactions.',
+                });
+            }
+        },
     })
 );
