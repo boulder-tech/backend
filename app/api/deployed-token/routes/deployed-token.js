@@ -1,9 +1,13 @@
-'use strict';
-
-/**
- * deployed-token router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::deployed-token.deployed-token');
+module.exports = {
+  routes: [
+    {
+      method: "POST",
+      path: "/deployed-token",
+      handler: "api::deployed-token.deployed-token.create",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
+  ],
+};

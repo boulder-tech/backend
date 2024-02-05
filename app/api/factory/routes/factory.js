@@ -1,9 +1,13 @@
-'use strict';
-
-/**
- * factory router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::factory.factory');
+module.exports = {
+  routes: [
+    {
+      method: "POST",
+      path: "/factory",
+      handler: "api::factory.factory.create",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
+  ],
+};
