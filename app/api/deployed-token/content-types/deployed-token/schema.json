@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deployed_tokens",
+  "info": {
+    "singularName": "deployed-token",
+    "pluralName": "deployed-tokens",
+    "displayName": "deployedToken",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "identity_registry": {
+      "type": "string"
+    },
+    "token_address": {
+      "type": "string"
+    },
+    "token_name": {
+      "type": "string"
+    },
+    "token_symbol": {
+      "type": "string"
+    },
+    "deployer_address": {
+      "type": "string"
+    },
+    "token_issuer_address": {
+      "type": "string"
+    },
+    "token_agent_address": {
+      "type": "string"
+    },
+    "token_admin_address": {
+      "type": "string"
+    },
+    "claim_issuer_address": {
+      "type": "string"
+    },
+    "identity_registry_storage_address": {
+      "type": "string"
+    },
+    "trex_factory_address": {
+      "type": "string"
+    },
+    "total_cost": {
+      "type": "string"
+    }
+  }
+}

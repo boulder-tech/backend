@@ -9,5 +9,14 @@ module.exports = {
                 policies: [],
             },
         },
+        {
+            method: 'GET',
+            path: '/token/all',
+            handler: 'api::token.token.findAll',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
     ],
 };

@@ -1,0 +1,101 @@
+{
+  "kind": "collectionType",
+  "collectionName": "factories",
+  "info": {
+    "singularName": "factory",
+    "pluralName": "factories",
+    "displayName": "Factory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "deployer_address": {
+      "type": "string"
+    },
+    "token_issuer_address": {
+      "type": "string"
+    },
+    "token_agent_address": {
+      "type": "string"
+    },
+    "token_admin_address": {
+      "type": "string"
+    },
+    "claim_issuer_address": {
+      "type": "string"
+    },
+    "token_holder_address": {
+      "type": "string"
+    },
+    "claim_topics_registry_implementation": {
+      "type": "string"
+    },
+    "trusted_issuers_registry_implementation": {
+      "type": "string"
+    },
+    "identity_registry_storage_implementation": {
+      "type": "string"
+    },
+    "identity_registry_implementation": {
+      "type": "string"
+    },
+    "modular_compliance_implementation": {
+      "type": "string"
+    },
+    "token_implementation": {
+      "type": "string"
+    },
+    "identity_implementation_authority": {
+      "type": "string"
+    },
+    "identity_factory": {
+      "type": "string"
+    },
+    "trex_implementation_authority": {
+      "type": "string"
+    },
+    "trex_factory": {
+      "type": "string"
+    },
+    "claim_topics_registry": {
+      "type": "string"
+    },
+    "trusted_issuers_registry": {
+      "type": "string"
+    },
+    "identity_registry_storage": {
+      "type": "string"
+    },
+    "default_compliance": {
+      "type": "string"
+    },
+    "identity_registry": {
+      "type": "string"
+    },
+    "tokenHolder_identity": {
+      "type": "string"
+    },
+    "token_address": {
+      "type": "string"
+    },
+    "token_name": {
+      "type": "string"
+    },
+    "token_symbol": {
+      "type": "string"
+    },
+    "agent_manager": {
+      "type": "string"
+    },
+    "claim_issuer_contract": {
+      "type": "string"
+    },
+    "total_minted": {
+      "type": "string"
+    },
+    "eth_total_cost": {
+      "type": "string"
+    }
+  }
+}
