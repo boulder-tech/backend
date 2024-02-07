@@ -38,10 +38,10 @@
     "claim_issuer_address": {
       "type": "string"
     },
-    "identity_registry_storage_address": {
+    "identity_registry_storage": {
       "type": "string"
     },
-    "trex_factory_address": {
+    "trex_factory": {
       "type": "string"
     },
     "total_cost": {

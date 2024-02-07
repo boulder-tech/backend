@@ -118,5 +118,27 @@ module.exports = createCoreController(
                 });
             }
         },
+        async findByHash(ctx) {
+            try {
+                const { hash } = ctx.params;
+
+                const transaction = await strapi.db
+                    .query('api::transaction.transaction')
+                    .findOne({
+                        where: { hash },
+                    });
+
+                return ctx.send({
+                    success: true,
+                    transaction,
+                });
+            } catch (error) {
+                console.error(error);
+                return ctx.send({
+                    success: false,
+                    message: 'Error occurred when getting all transactions.',
+                });
+            }
+        },
     })
 );

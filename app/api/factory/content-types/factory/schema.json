@@ -4,7 +4,8 @@
   "info": {
     "singularName": "factory",
     "pluralName": "factories",
-    "displayName": "Factory"
+    "displayName": "Factory",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -92,9 +93,12 @@
       "type": "string"
     },
     "total_minted": {
-      "type": "string"
+      "type": "biginteger"
     },
     "eth_total_cost": {
+      "type": "float"
+    },
+    "factory_name": {
       "type": "string"
     }
   }
