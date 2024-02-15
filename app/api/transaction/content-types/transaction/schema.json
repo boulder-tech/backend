@@ -42,7 +42,7 @@
       "type": "string"
     },
     "token_minted": {
-      "type": "integer"
+      "type": "float"
     },
     "change": {
       "type": "float"

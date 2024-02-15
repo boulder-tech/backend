@@ -9,6 +9,9 @@ module.exports = ({ env }) => ({
   },
   environment: env('NODE_ENV'),
   frontendURL: env('FRONTEND_URL'),
+  jwt: {
+    secret: env('JWT_SECRET'),
+  },
   managerApiURL: env('MANAGER_API_URL'),
   personaApiKey: env('PERSONA_API_KEY_SANDBOX'),
   personaApiURL: env('PERSONA_API_URL'),

@@ -24,8 +24,6 @@ module.exports = createCoreController(
     async findBySymbol(ctx) {
       const { symbol } = ctx.params;
 
-      console.log('symbol', symbol);
-
       const token = await strapi.db
         .query('api::deployed-token.deployed-token')
         .findOne({

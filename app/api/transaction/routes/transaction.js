@@ -21,7 +21,7 @@ module.exports = {
     {
       method: 'GET',
       path: '/transaction/address/:address',
-      handler: 'api::transaction.transaction.allTransactions',
+      handler: 'api::transaction.transaction.allTransactionsByAddress',
       config: {
         auth: false,
         policies: [],
@@ -40,6 +40,15 @@ module.exports = {
       method: 'GET',
       path: '/transaction/:hash',
       handler: 'api::transaction.transaction.findByHash',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/transactions',
+      handler: 'api::transaction.transaction.fetchAllTransactions',
       config: {
         auth: false,
         policies: [],
