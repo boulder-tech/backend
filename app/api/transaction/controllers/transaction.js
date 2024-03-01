@@ -92,8 +92,21 @@ module.exports = createCoreController(
         const transactions = await strapi.db
           .query('api::transaction.transaction')
           .findMany({
+            select: [
+              'hash',
+              'hash_mint',
+              'amount_stable',
+              'type_stable',
+              'token',
+              'token_minted',
+              'status',
+            ],
             where: { client_id: client.id },
+            orderBy: { createdAt: 'DESC' },
+            limit: 100,
           });
+
+        console.log('transactions', transactions);
 
         return ctx.send({
           success: true,
