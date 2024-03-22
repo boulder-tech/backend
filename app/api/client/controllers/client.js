@@ -232,6 +232,8 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
   async getByPublicAddress(ctx) {
     const { address } = ctx.params;
 
+    console.log('GET BY PUBLIC ADDRESS', address);
+
     const existingAddress = await strapi.db
       .query('api::public-address.public-address')
       .findOne({
@@ -308,7 +310,7 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
       },
     };
 
-    console.log('CREATING INQUIRY WITH REFERENCE ID', public_address);
+    console.log('CREATING INQUIRY WITH REFERENCE ID ->', public_address);
 
     const meta = {
       'auto-create-account': true,
@@ -330,6 +332,12 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
     return kyc;
   },
   async withPersonaStatus(ctx) {
+    if (ctx.request.body.abi) {
+      return ctx.send({
+        success: true,
+      });
+    }
+
     const {
       data: {
         attributes: {
@@ -369,11 +377,19 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
+      console.log('address', address);
+
       const {
         identity_registry: identity_registry_address,
         identity_implementation_authority:
           identity_implementation_authority_address,
       } = await strapi.db.query('api::factory.factory').findOne({});
+
+      console.log('identity_registry_address', identity_registry_address);
+      console.log(
+        'identity_implementation_authority_address',
+        identity_implementation_authority_address
+      );
 
       try {
         console.log('managerApiURL', managerApiURL);

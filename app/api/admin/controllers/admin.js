@@ -329,11 +329,19 @@ module.exports = createCoreController('api::admin.admin', ({ strapi }) => ({
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
+      console.log('address', address);
+
       const {
         identity_registry: identity_registry_address,
         identity_implementation_authority:
           identity_implementation_authority_address,
       } = await strapi.db.query('api::factory.factory').findOne({});
+
+      console.log('identity_registry_address', identity_registry_address);
+      console.log(
+        'identity_implementation_authority_address',
+        identity_implementation_authority_address
+      );
 
       try {
         console.log('managerApiURL', managerApiURL);

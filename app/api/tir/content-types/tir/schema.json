@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tirs",
+  "info": {
+    "singularName": "tir",
+    "pluralName": "tirs",
+    "displayName": "TIR",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Value": {
+      "type": "string"
+    },
+    "Resolution": {
+      "type": "string"
+    },
+    "Name": {
+      "type": "string"
+    }
+  }
+}
