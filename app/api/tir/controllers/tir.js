@@ -9,6 +9,20 @@ const moment = require('moment');
 const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::tir.tir', ({ strapi }) => ({
+  async findByName(ctx) {
+    const { name } = ctx.params;
+
+    const { value } = await strapi.db.query('api::tir.tir').findOne({
+      select: ['value'],
+      where: { name },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return ctx.send({
+      value,
+    });
+  },
+  
   async saveTirDiffRes(ctx) {
     try {
       const { name, value } = ctx.request.body;
