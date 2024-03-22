@@ -1,0 +1,17 @@
+{
+  "kind": "collectionType",
+  "collectionName": "volumes",
+  "info": {
+    "singularName": "volume",
+    "pluralName": "volumes",
+    "displayName": "VOLUME"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Name": {
+      "type": "string"
+    }
+  }
+}
