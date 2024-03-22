@@ -1,9 +1,13 @@
-'use strict';
-
-/**
- * volume router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::volume.volume');
+module.exports = {
+    routes: [
+        {
+            method: 'POST',
+            path: '/volume/saveVolDiffRes',
+            handler: 'api::volume.volume.saveVolDiffRes',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
+    ],
+};

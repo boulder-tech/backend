@@ -1,9 +1,13 @@
-'use strict';
-
-/**
- * tir router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::tir.tir');
+module.exports = {
+    routes: [
+        {
+            method: 'POST',
+            path: '/tir/saveTirDiffRes',
+            handler: 'api::tir.tir.saveTirDiffRes',
+            config: {
+                auth: false,
+                policies: [],
+            },
+        },
+    ],
+};
