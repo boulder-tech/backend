@@ -4,13 +4,20 @@
   "info": {
     "singularName": "volume",
     "pluralName": "volumes",
-    "displayName": "VOLUME"
+    "displayName": "VOLUME",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "attributes": {
-    "Name": {
+    "name": {
+      "type": "string"
+    },
+    "value": {
+      "type": "float"
+    },
+    "resolution": {
       "type": "string"
     }
   }

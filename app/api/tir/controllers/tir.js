@@ -4,6 +4,8 @@
  * tir controller
  */
 
+const moment = require('moment');
+
 const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::tir.tir', ({ strapi }) => ({

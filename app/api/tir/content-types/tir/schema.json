@@ -11,14 +11,14 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "Value": {
+    "resolution": {
       "type": "string"
     },
-    "Resolution": {
+    "name": {
       "type": "string"
     },
-    "Name": {
-      "type": "string"
+    "value": {
+      "type": "float"
     }
   }
 }
