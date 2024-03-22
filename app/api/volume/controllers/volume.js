@@ -6,7 +6,7 @@
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
-module.exports = createCoreController('api::volume.volume'), ({ strapi }) => ({
+module.exports = createCoreController('api::volume.volume', ({ strapi }) => ({
     async saveVolDiffRes(ctx) {
         try {
           const { name, value } = ctx.request.body;
@@ -78,5 +78,5 @@ module.exports = createCoreController('api::volume.volume'), ({ strapi }) => ({
           return ctx.send({ error: 'An error occurred' }, 500);
         }
       },
-})
+}))
 
