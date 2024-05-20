@@ -102,7 +102,7 @@ module.exports = createCoreController(
               'token_minted',
               'status',
               'price_bid',
-              'price_mint',
+              'price_minted',
             ],
             where: { client_id: client.id },
             orderBy: { createdAt: 'DESC' },
