@@ -103,6 +103,18 @@
     },
     "tokenOID": {
       "type": "string"
+    },
+    "external_agent_address": {
+      "type": "string"
+    },
+    "network": {
+      "type": "string"
+    },
+    "stable_receiver_address": {
+      "type": "string"
+    },
+    "token_decimals": {
+      "type": "biginteger"
     }
   }
 }

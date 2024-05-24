@@ -329,43 +329,16 @@ module.exports = createCoreController('api::admin.admin', ({ strapi }) => ({
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
-      console.log('address', address);
-
-      const {
-        identity_registry: identity_registry_address,
-        identity_implementation_authority:
-          identity_implementation_authority_address,
-      } = await strapi.db.query('api::factory.factory').findOne({});
-
-      console.log('identity_registry_address', identity_registry_address);
-      console.log(
-        'identity_implementation_authority_address',
-        identity_implementation_authority_address
-      );
-
-      try {
-        console.log('managerApiURL', managerApiURL);
-        await axios.post(
-          `${managerApiURL}/register_identity`,
-          {
-            client_address: address,
-            identity_registry_address,
-            identity_implementation_authority_address,
-          },
-          { headers: {} }
-        );
-      } catch (e) {
-        console.log('ERROR AT REGISTER IDENTITY', e);
-      }
-
       await this.updateClient({
         address,
-        status: 'approved',
+        status: 'kyc_approved',
       });
 
+      /*
       strapi.io.sockets
         .in(address)
         .emit('kyc-approved', { address, status: 'approved' });
+      */
     } else if (name === 'inquiry.expired') {
       console.log(`INQUIRY ${inquiryId} EXPIRED: ANOTHER ONE BITES THE DUST`);
 

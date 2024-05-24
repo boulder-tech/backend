@@ -44,7 +44,37 @@
     "trex_factory": {
       "type": "string"
     },
-    "total_cost": {
+    "eth_total_cost": {
+      "type": "string"
+    },
+    "network": {
+      "type": "string"
+    },
+    "token_erc": {
+      "type": "string"
+    },
+    "external_agent_address": {
+      "type": "string"
+    },
+    "stable_receiver_address": {
+      "type": "string"
+    },
+    "token_holder_address": {
+      "type": "string"
+    },
+    "token_decimals": {
+      "type": "integer"
+    },
+    "token_implementation_address": {
+      "type": "string"
+    },
+    "identity_implementation_authority": {
+      "type": "string"
+    },
+    "claim_topics_registry": {
+      "type": "string"
+    },
+    "agent_manager": {
       "type": "string"
     }
   }

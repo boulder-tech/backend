@@ -35,5 +35,19 @@ module.exports = createCoreController(
         success: true,
       });
     },
+    async findByIdentityRegistryAddress(ctx) {
+      const { address } = ctx.params;
+
+      const token = await strapi.db
+        .query('api::deployed-token.deployed-token')
+        .findOne({
+          where: { identity_registry: address },
+        });
+
+      return ctx.send({
+        token,
+        success: true,
+      });
+    },
   })
 );

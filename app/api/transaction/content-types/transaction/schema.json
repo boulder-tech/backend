@@ -46,6 +46,12 @@
     },
     "change": {
       "type": "float"
+    },
+    "price_minted": {
+      "type": "float"
+    },
+    "price_bid": {
+      "type": "float"
     }
   }
 }

@@ -27,5 +27,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/identity-registry/:address/token',
+      handler: 'api::deployed-token.deployed-token.findByIdentityRegistryAddress',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

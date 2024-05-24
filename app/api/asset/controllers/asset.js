@@ -12,30 +12,38 @@ module.exports = createCoreController('api::asset.asset', ({ strapi }) => ({
   async findByName(ctx) {
     const { name } = ctx.params;
 
-    const { price } = await strapi.db.query('api::asset.asset').findOne({
-      select: ['price'],
-      where: { name },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    // Obtener la fecha actual y la fecha de hace 24 horas
-    const currentDate = moment();
-    const pastDate = moment().subtract(24, 'hours');
-
-    const { price: price_24h } = await strapi.db
-      .query('api::asset.asset')
-      .findOne({
+    const [currentAsset, asset24hAgo] = await Promise.all([
+      strapi.db.query('api::asset.asset').findOne({
+        select: ['price'],
+        where: { name },
+        orderBy: { createdAt: 'desc' },
+      }),
+      strapi.db.query('api::asset.asset').findOne({
         select: ['price'],
         where: {
           name,
           createdAt: {
-            // $gte: pastDate.toISOString(), // Filtrar por fechas mayores o iguales a hace 24 horas
-            // $lte: currentDate.toISOString(), // Filtrar por fechas menores o iguales a la fecha actual
-            $lte: pastDate.toISOString(), // Filtrar por fechas menores o iguales a la fecha de hace 24 h
+            $lte: moment().subtract(24, 'hours').toISOString(), // Filtrar por fechas menores o iguales a la fecha de hace 24 h
           },
         },
         orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    let firstPrice = 0;
+
+    if (!asset24hAgo) {
+      const firstAsset = await strapi.db.query('api::asset.asset').findOne({
+        select: ['price'],
+        where: { name },
+        orderBy: { createdAt: 'asc' },
       });
+
+      firstPrice = firstAsset ? firstAsset.price : 0;
+    }
+
+    const price = currentAsset ? currentAsset.price : 0;
+    const price_24h = asset24hAgo ? asset24hAgo.price : firstPrice;
 
     return ctx.send({
       price,

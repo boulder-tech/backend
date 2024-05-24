@@ -11,6 +11,7 @@ const web3 = require('web3');
 const Persona = require('../../../services/Persona');
 
 const {
+  verifyJWT,
   generateRegistrationToken,
   verifyRegistrationToken,
 } = require('../../../utils/auth');
@@ -377,43 +378,16 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
-      console.log('address', address);
-
-      const {
-        identity_registry: identity_registry_address,
-        identity_implementation_authority:
-          identity_implementation_authority_address,
-      } = await strapi.db.query('api::factory.factory').findOne({});
-
-      console.log('identity_registry_address', identity_registry_address);
-      console.log(
-        'identity_implementation_authority_address',
-        identity_implementation_authority_address
-      );
-
-      try {
-        console.log('managerApiURL', managerApiURL);
-        await axios.post(
-          `${managerApiURL}/register_identity`,
-          {
-            client_address: address,
-            identity_registry_address,
-            identity_implementation_authority_address,
-          },
-          { headers: {} }
-        );
-      } catch (e) {
-        console.log('ERROR AT REGISTER IDENTITY', e);
-      }
-
       await this.updateClient({
         address,
-        status: 'approved',
+        status: 'kyc_approved',
       });
 
+      /*
       strapi.io.sockets
         .in(address)
         .emit('kyc-approved', { address, status: 'approved' });
+      */
     } else if (name === 'inquiry.expired') {
       console.log(`INQUIRY ${inquiryId} EXPIRED: ANOTHER ONE BITES THE DUST`);
 
@@ -457,6 +431,45 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
       await strapi.db.query('api::client.client').update({
         where: { id: existingAddress.client.id },
         data,
+      });
+    }
+  },
+  async getAllKycApproved(ctx) {
+    const { status } = ctx.params;
+
+    const clients = await strapi.db.query('api::client.client').findMany({
+      select: ['createdAt'],
+      where: { status },
+      populate: { public_addresses: true },
+    });
+
+    return ctx.send({
+      clients,
+      success: true,
+    });
+  },
+  async batchRegisterIdentity(ctx) {
+    const payload = ctx.request.body;
+
+    try {
+      const response = await axios.post(
+        'http://54.67.10.124:5000/batch_register_identity',
+        payload,
+        {
+          headers: {
+            // Puedes incluir otros encabezados según sea necesario
+          },
+        }
+      );
+
+      console.log('RESPONSE', response);
+
+      return ctx.send({
+        success: true,
+      });
+    } catch (e) {
+      return ctx.send({
+        success: false,
       });
     }
   },
