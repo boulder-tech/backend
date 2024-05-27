@@ -5,6 +5,7 @@
  */
 
 const moment = require('moment');
+const { fetchHistoricalPrice } = require('../../../utils');
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -126,11 +127,22 @@ module.exports = createCoreController('api::asset.asset', ({ strapi }) => ({
   async fetchHistoricalData(ctx) {
     const { name, resolution } = ctx.params;
 
-    const history = await strapi.db.query('api::asset.asset').findMany({
-      where: { name, resolution },
-      orderBy: { createdAt: 'DESC' },
-      limit: 100,
-    });
+    let history = [];
+
+    if (resolution === '1d' || resolution === '1M') {
+      let prices = [];
+
+      for (let i = 1; i <= 20; i++) {
+        prices.push(fetchHistoricalPrice({ name, range: i, resolution }));
+      }
+
+      history = (await Promise.all(prices)).filter((price) => !!price);
+    } else
+      history = await strapi.db.query('api::asset.asset').findMany({
+        where: { name, resolution },
+        orderBy: { createdAt: 'DESC' },
+        limit: 100,
+      });
 
     return ctx.send({
       history,
