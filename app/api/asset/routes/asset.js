@@ -69,7 +69,7 @@ module.exports = {
     },
     {
       method: 'GET',
-      path: '/asset/:name/resolution/:resolution',
+      path: '/asset/:name/range/:range',
       handler: 'api::asset.asset.fetchHistoricalData',
       config: {
         auth: false,

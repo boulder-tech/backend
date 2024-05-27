@@ -124,10 +124,25 @@ module.exports = createCoreController('api::asset.asset', ({ strapi }) => ({
     }
   },
   async fetchHistoricalData(ctx) {
-    const { name, resolution } = ctx.params;
+    const { name, range } = ctx.params;
+
+    const now = new Date();
+    const oneWeekBefore = new Date();
+    oneWeekBefore.setDate(now.getDate() - 7);
 
     const history = await strapi.db.query('api::asset.asset').findMany({
-      where: { name, resolution },
+      where: {
+        $and: [
+          {
+            name
+          },
+          {
+            createdAt: {
+              $between: [now.toISOString(), oneWeekBefore.toISOString()]
+            },
+          },
+        ],
+      },
       orderBy: { createdAt: 'DESC' },
       limit: 100,
     });
