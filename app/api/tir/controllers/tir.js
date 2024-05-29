@@ -1,97 +1,84 @@
-'use strict';
+"use strict";
 
 /**
  * tir controller
  */
 
-const moment = require('moment');
+const moment = require("moment");
 
-const { createCoreController } = require('@strapi/strapi').factories;
+const { createCoreController } = require("@strapi/strapi").factories;
 
-module.exports = createCoreController('api::tir.tir', ({ strapi }) => ({
-  async findByName(ctx) {
-    const { name } = ctx.params;
+(module.exports = createCoreController("api::tir.tir")),
+  ({ strapi }) => ({
+    async saveTirDiffRes(ctx) {
+      try {
+        const { name, value } = ctx.request.body;
 
-    const { value } = await strapi.db.query('api::tir.tir').findOne({
-      select: ['value'],
-      where: { name },
-      orderBy: { createdAt: 'desc' },
-    });
+        const currentDate = moment().startOf("minute");
+        console.log(`current date: ${currentDate}`);
 
-    return ctx.send({
-      value,
-    });
-  },
-  
-  async saveTirDiffRes(ctx) {
-    try {
-      const { name, value } = ctx.request.body;
+        const resolutions = [];
 
-      const currentDate = moment().startOf('minute');
-      console.log(`current date: ${currentDate}`);
+        // 5 minutes
+        if (currentDate.minute() % 5 === 0) {
+          resolutions.push("5m");
+        }
 
-      const resolutions = [];
+        // 15 minutes
+        if (currentDate.minute() % 15 === 0) {
+          resolutions.push("15m");
+        }
 
-      // 5 minutes
-      if (currentDate.minute() % 5 === 0) {
-        resolutions.push('5m');
-      }
+        // half hour
+        if (currentDate.minute() % 30 === 0) {
+          resolutions.push("30m");
+        }
 
-      // 15 minutes
-      if (currentDate.minute() % 15 === 0) {
-        resolutions.push('15m');
-      }
+        // hourly
+        if (currentDate.minute() === 0) {
+          resolutions.push("1h");
+        }
 
-      // half hour
-      if (currentDate.minute() % 30 === 0) {
-        resolutions.push('30m');
-      }
+        // 4 hours
+        if (currentDate.hour() % 4 === 0 && currentDate.minute() === 0) {
+          resolutions.push("4h");
+        }
 
-      // hourly
-      if (currentDate.minute() === 0) {
-        resolutions.push('1h');
-      }
+        // 8 hours
+        if (currentDate.hour() % 8 === 0 && currentDate.minute() === 0) {
+          resolutions.push("8h");
+        }
 
-      // 4 hours
-      if (currentDate.hour() % 4 === 0 && currentDate.minute() === 0) {
-        resolutions.push('4h');
-      }
+        // daily
+        if (currentDate.hour() === 21 && currentDate.minute() === 0) {
+          resolutions.push("1d");
+        }
 
-      // 8 hours
-      if (currentDate.hour() % 8 === 0 && currentDate.minute() === 0) {
-        resolutions.push('8h');
-      }
+        if (
+          currentDate.day() == 5 &&
+          currentDate.hour() === 21 &&
+          currentDate.minute() === 0
+        ) {
+          resolutions.push("1w");
+        }
 
-      // daily
-      if (currentDate.hour() === 0 && currentDate.minute() === 0) {
-        resolutions.push('1d');
-      }
+        console.log(`RESOLUTIONS: ${resolutions}`);
+        for (const resolution of resolutions) {
+          await strapi.db.query("api::tir.tir").create({
+            data: {
+              name,
+              value,
+              resolution,
+            },
+          });
+        }
 
-      if (
-        currentDate.day() == 5 &&
-        currentDate.hour() === 21 &&
-        currentDate.minute() === 0
-      ) {
-        resolutions.push('1w');
-      }
-
-      console.log(`RESOLUTIONS: ${resolutions}`);
-      for (const resolution of resolutions) {
-        await strapi.db.query('api::tir.tir').create({
-          data: {
-            name,
-            value,
-            resolution,
-          },
+        return ctx.send({
+          success: true,
         });
+      } catch (error) {
+        console.error(error);
+        return ctx.send({ error: "An error occurred" }, 500);
       }
-
-      return ctx.send({
-        success: true,
-      });
-    } catch (error) {
-      console.error(error);
-      return ctx.send({ error: 'An error occurred' }, 500);
-    }
-  },
-}));
+    },
+  });

@@ -93,7 +93,7 @@ module.exports = createCoreController('api::asset.asset', ({ strapi }) => ({
       }
 
       // daily
-      if (currentDate.hour() === 0 && currentDate.minute() === 0) {
+      if (currentDate.hour() === 21 && currentDate.minute() === 0) {
         resolutions.push('1d');
       }
 
