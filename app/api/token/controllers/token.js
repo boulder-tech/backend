@@ -172,6 +172,46 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
       }
     }
   },
+  async deployFactory(ctx) {
+    const {
+      name: factory_name,
+      private_key: deployer_private_key,
+      network,
+    } = ctx.request.body;
+
+    try {
+      const response = await axios.post(
+        `http://54.67.10.124:${
+          network === 'arbitrumSepolia' ? '4000' : '5000'
+        }/deploy_factory_one_account`,
+        {
+          factory_name,
+          deployer_private_key,
+        },
+        {
+          headers: {},
+        }
+      );
+
+      console.log('RESPONSE', response);
+
+      return ctx.send({
+        success: true,
+      });
+    } catch (e) {
+      console.log('ERROR', e);
+      return ctx.send(
+        {
+          success: false,
+        },
+        500
+      );
+    }
+
+    return ctx.send({
+      success: true,
+    });
+  },
   async mint(ctx) {
     const { authorization } = ctx.request.headers;
 

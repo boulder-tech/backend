@@ -26,7 +26,7 @@ module.exports = createCoreController(
           hash,
           status,
           type_stable,
-          price_bid
+          price_bid,
         },
       });
 
@@ -108,8 +108,6 @@ module.exports = createCoreController(
             orderBy: { createdAt: 'DESC' },
             limit: 100,
           });
-
-        console.log('transactions', transactions);
 
         return ctx.send({
           success: true,

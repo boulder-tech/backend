@@ -43,6 +43,12 @@
     },
     "kyc_url": {
       "type": "string"
+    },
+    "deployed_tokens": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::deployed-token.deployed-token",
+      "mappedBy": "client"
     }
   }
 }

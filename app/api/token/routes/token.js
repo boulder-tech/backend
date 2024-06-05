@@ -29,6 +29,16 @@ module.exports = {
     },
     {
       method: 'POST',
+      path: '/token/deploy-factory',
+      handler: 'api::token.token.deployFactory',
+      config: {
+        auth: false,
+        policies: [],
+        middlewares: ['api::admin.auth'],
+      },
+    },
+    {
+      method: 'POST',
       path: '/token/mint',
       handler: 'api::token.token.mint',
       config: {

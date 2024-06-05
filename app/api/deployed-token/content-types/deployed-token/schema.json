@@ -76,6 +76,36 @@
     },
     "agent_manager": {
       "type": "string"
+    },
+    "segregated_account": {
+      "type": "string"
+    },
+    "investment_minimum": {
+      "type": "float"
+    },
+    "objective_date": {
+      "type": "datetime"
+    },
+    "price": {
+      "type": "float"
+    },
+    "is_completed": {
+      "type": "boolean"
+    },
+    "total_supply": {
+      "type": "biginteger"
+    },
+    "token_blacklister_address": {
+      "type": "string"
+    },
+    "token_pauser_address": {
+      "type": "string"
+    },
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::client.client",
+      "inversedBy": "deployed_tokens"
     }
   }
 }

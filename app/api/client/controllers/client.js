@@ -172,6 +172,8 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
 
     const kyc = await this.createOneTimeLinkForKyc(address);
 
+    console.log('KYC', kyc);
+
     const { id } = await strapi.db.query('api::client.client').create({
       data: { status: 'created', kyc_url: kyc['one-time-link-short'] },
     });
@@ -325,6 +327,8 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
       meta,
     });
 
+    console.log('INQUIRY ID =>', inquiryId);
+
     const { meta: kyc } = await persona.generateOneTimeInquiryLink({
       inquiryId,
       meta: {},
@@ -391,12 +395,12 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
     } else if (name === 'inquiry.expired') {
       console.log(`INQUIRY ${inquiryId} EXPIRED: ANOTHER ONE BITES THE DUST`);
 
-      const kyc = await this.createOneTimeLinkForKyc(address);
-
       const address =
         environment === 'development'
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
+
+      const kyc = await this.createOneTimeLinkForKyc(address);
 
       await this.updateClient({
         address,
