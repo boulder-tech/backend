@@ -9,6 +9,7 @@ module.exports = {
                 policies: [],
             },
         },
+        /*
         {
             method: 'GET',
             path: '/tir/name/:name',
@@ -18,5 +19,6 @@ module.exports = {
                 policies: [],
             },
         },
+        */
     ],
 };
