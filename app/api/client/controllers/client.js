@@ -435,7 +435,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       await strapi.db.query("api::client.client").update({
         where: {
           id: existingAddress.client.id,
-          status: { $eq: "pending_onboarding" },
+          status: { $eq: "pending_review" },
         },
         data,
       });
