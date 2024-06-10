@@ -23,12 +23,20 @@ const secretAccessKey = strapi.config.get(
   "environments.aws.ses.secretAccessKey",
   ""
 );
+
 const aws_ses_email = strapi.config.get("environments.aws.ses.email", "");
 const region = strapi.config.get("environments.aws.region", "");
 const frontendURL = strapi.config.get("environments.frontendURL");
 const personaApiKey = strapi.config.get("environments.personaApiKey");
 const environment = strapi.config.get("environments.environment");
 const managerApiURL = strapi.config.get("environments.managerApiURL");
+
+const persona_status = {
+  kyc_approved: "pending_review",
+  pending_review: "pending_onboarding",
+  approved: "kyc_approved",
+  created: "pending_onboarding",
+};
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -435,7 +443,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       await strapi.db.query("api::client.client").update({
         where: {
           id: existingAddress.client.id,
-          status: { $eq: "pending_review" },
+          status: { $eq: persona_status[data.status] },
         },
         data,
       });
