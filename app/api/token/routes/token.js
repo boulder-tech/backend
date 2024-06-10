@@ -44,6 +44,7 @@ module.exports = {
       config: {
         auth: false,
         policies: [],
+        middlewares: ['api::admin.auth'],
       },
     },
   ],

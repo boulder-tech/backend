@@ -49,6 +49,9 @@
       "relation": "oneToMany",
       "target": "api::deployed-token.deployed-token",
       "mappedBy": "client"
+    },
+    "client_erc3643_identity": {
+      "type": "string"
     }
   }
 }
