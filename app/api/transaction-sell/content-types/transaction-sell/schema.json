@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transaction_sells",
+  "info": {
+    "singularName": "transaction-sell",
+    "pluralName": "transaction-sells",
+    "displayName": "TransactionSell"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "client": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::client.client"
+    },
+    "token_amount": {
+      "type": "integer"
+    },
+    "token": {
+      "type": "string",
+      "required": true
+    },
+    "hash": {
+      "type": "string",
+      "required": true
+    },
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "hash_redeem": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "required": true
+    },
+    "price_ask": {
+      "type": "float"
+    },
+    "price_sold": {
+      "type": "float"
+    }
+  }
+}

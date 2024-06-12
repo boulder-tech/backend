@@ -106,6 +106,9 @@
       "relation": "manyToOne",
       "target": "api::client.client",
       "inversedBy": "deployed_tokens"
+    },
+    "token_holder_identity_address": {
+      "type": "string"
     }
   }
 }
