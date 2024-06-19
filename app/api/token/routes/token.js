@@ -47,5 +47,25 @@ module.exports = {
         middlewares: ['api::admin.auth'],
       },
     },
+    {
+      method: 'POST',
+      path: '/token/change',
+      handler: 'api::token.token.change',
+      config: {
+        auth: false,
+        policies: [],
+        middlewares: ['api::admin.auth'],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/token/burn',
+      handler: 'api::token.token.burn',
+      config: {
+        auth: false,
+        policies: [],
+        middlewares: ['api::admin.auth'],
+      },
+    },
   ],
 };

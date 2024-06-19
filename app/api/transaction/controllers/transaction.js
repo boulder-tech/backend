@@ -77,6 +77,29 @@ module.exports = createCoreController(
         );
       }
     },
+    async updateTransaction(ctx) {
+      const { hash, ...data } = ctx.request.body;
+
+      try {
+        await strapi.db.query('api::transaction.transaction').update({
+          where: { hash },
+          data,
+        });
+
+        return ctx.send({
+          success: true,
+        });
+      } catch (e) {
+        console.log('ERROR AT UPDATE TRANSFER', e);
+
+        return ctx.send(
+          {
+            success: false,
+          },
+          500
+        );
+      }
+    },
     async allTransactionsByAddress(ctx) {
       try {
         const { address } = ctx.params;
@@ -109,9 +132,43 @@ module.exports = createCoreController(
             limit: 100,
           });
 
+        let redeemTransactions = await strapi.db
+          .query('api::transaction-sell.transaction-sell')
+          .findMany({
+            select: [
+              'hash',
+              'hash_redeem',
+              'token_amount',
+              'token',
+              'status',
+              'price_ask',
+              'price_sold',
+            ],
+            where: { client_id: client.id },
+            orderBy: { createdAt: 'DESC' },
+            limit: 100,
+          });
+
+        redeemTransactions = redeemTransactions.map((transaction) => ({
+          hash: transaction.hash,
+          hash_mint: transaction.hash_redeem,
+          amount_stable: transaction.token_amount,
+          type_stable: transaction.token,
+          token: transaction.token,
+          price_bid: transaction.price_ask,
+          status: transaction.status,
+          createdAt: transaction.createdAt,
+        }));
+
+        const combinedTransactions = [...transactions, ...redeemTransactions];
+
+        combinedTransactions.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
         return ctx.send({
           success: true,
-          transactions,
+          transactions: combinedTransactions,
         });
       } catch (error) {
         console.error(error);
@@ -175,11 +232,26 @@ module.exports = createCoreController(
             orderBy: { createdAt: 'DESC' },
           });
 
-        console.log('TRANSACTIONS', transactions);
+        const redeemTransactions = await strapi.db
+          .query('api::transaction-sell.transaction-sell')
+          .findMany({
+            start: 0,
+            limit: 10,
+            orderBy: { createdAt: 'DESC' },
+          });
+
+        const combinedTransactions = [...transactions, ...redeemTransactions];
+
+        combinedTransactions.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Limita el resultado a los primeros 10 elementos
+        const limitedTransactions = combinedTransactions.slice(0, 10);
 
         return ctx.send({
           success: true,
-          transactions,
+          transactions: combinedTransactions,
         });
       } catch (error) {
         console.error(error);
@@ -198,8 +270,6 @@ module.exports = createCoreController(
             limit: 10,
             orderBy: { createdAt: 'DESC' },
           });
-
-        console.log('TRANSACTIONS', transactions);
 
         return ctx.send({
           success: true,

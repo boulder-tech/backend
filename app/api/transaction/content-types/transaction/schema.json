@@ -52,6 +52,12 @@
     },
     "price_bid": {
       "type": "float"
+    },
+    "hash_change": {
+      "type": "string"
+    },
+    "network": {
+      "type": "string"
     }
   }
 }

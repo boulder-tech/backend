@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
 /**
  * transaction-sell controller
  */
 
-const { createCoreController } = require("@strapi/strapi").factories;
+const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController(
-  "api::transaction-sell.transaction-sell",
+  'api::transaction-sell.transaction-sell',
   ({ strapi }) => ({
     async startTransaction(ctx) {
       const { token_amount, token, address, hash, price_ask } =
@@ -15,9 +15,9 @@ module.exports = createCoreController(
 
       const client = await this.getByPublicAddress(address);
 
-      const status = "pending_redeem";
+      const status = 'pending_redeem';
 
-      await strapi.db.query("api::transaction-sell.transaction-sell").create({
+      await strapi.db.query('api::transaction-sell.transaction-sell').create({
         data: {
           client_id: client.id,
           token_amount,
@@ -35,7 +35,7 @@ module.exports = createCoreController(
     },
     async getByPublicAddress(address) {
       const existingAddress = await strapi.db
-        .query("api::public-address.public-address")
+        .query('api::public-address.public-address')
         .findOne({
           where: { address },
           populate: { client: true },
@@ -52,10 +52,10 @@ module.exports = createCoreController(
       const { amount_redeemed, hash_redeem, hash } = ctx.request.body;
 
       try {
-        await strapi.db.query("api::transaction-sell.transaction-sell").update({
+        await strapi.db.query('api::transaction-sell.transaction-sell').update({
           where: { hash: hash },
           data: {
-            status: "token_redeemed",
+            status: 'token_redeemed',
             amount_redeemed: parseFloat(amount_redeemed),
             hash_redeem,
           },
@@ -65,7 +65,30 @@ module.exports = createCoreController(
           success: true,
         });
       } catch (e) {
-        console.log("ERROR AT END TRANSFER", e);
+        console.log('ERROR AT END TRANSFER', e);
+
+        return ctx.send(
+          {
+            success: false,
+          },
+          500
+        );
+      }
+    },
+    async updateTransaction(ctx) {
+      const { hash, ...data } = ctx.request.body;
+
+      try {
+        await strapi.db.query('api::transaction-sell.transaction-sell').update({
+          where: { hash },
+          data,
+        });
+
+        return ctx.send({
+          success: true,
+        });
+      } catch (e) {
+        console.log('ERROR AT UPDATE TRANSFER', e);
 
         return ctx.send(
           {
@@ -84,25 +107,25 @@ module.exports = createCoreController(
         if (!client) {
           return ctx.send({
             success: false,
-            message: "Client not found on db",
+            message: 'Client not found on db',
           });
         }
 
         const transactions = await strapi.db
-          .query("api::transaction-sell.transaction-sell")
+          .query('api::transaction-sell.transaction-sell')
           .findMany({
             select: [
-              "hash",
-              "hash_redeem",
-              "token_amount",
-              "token",
-              "amount_redeemed",
-              "status",
-              "price_ask",
-              "price_sold",
+              'hash',
+              'hash_redeem',
+              'token_amount',
+              'token',
+              'amount_redeemed',
+              'status',
+              'price_ask',
+              'price_sold',
             ],
             where: { client_id: client.id },
-            orderBy: { createdAt: "DESC" },
+            orderBy: { createdAt: 'DESC' },
             limit: 100,
           });
 
@@ -114,7 +137,7 @@ module.exports = createCoreController(
         console.error(error);
         return ctx.send({
           success: false,
-          message: "Error occurred when getting all transactions.",
+          message: 'Error occurred when getting all transactions.',
         });
       }
     },
@@ -123,7 +146,7 @@ module.exports = createCoreController(
         const { token } = ctx.params;
 
         const transactions = await strapi.db
-          .query("api::transaction-sell.transaction-sell")
+          .query('api::transaction-sell.transaction-sell')
           .findMany({
             where: { token },
           });
@@ -136,7 +159,7 @@ module.exports = createCoreController(
         console.error(error);
         return ctx.send({
           success: false,
-          message: "Error occurred when getting all transactions.",
+          message: 'Error occurred when getting all transactions.',
         });
       }
     },
@@ -145,7 +168,7 @@ module.exports = createCoreController(
         const { hash } = ctx.params;
 
         const transaction = await strapi.db
-          .query("api::transaction-sell.transaction-sell")
+          .query('api::transaction-sell.transaction-sell')
           .findOne({
             where: { hash },
           });
@@ -158,21 +181,19 @@ module.exports = createCoreController(
         console.error(error);
         return ctx.send({
           success: false,
-          message: "Error occurred when getting all transactions.",
+          message: 'Error occurred when getting all transactions.',
         });
       }
     },
     async fetchAllTransactions(ctx) {
       try {
         const transactions = await strapi.db
-          .query("api::transaction-sell.transaction-sell")
+          .query('api::transaction-sell.transaction-sell')
           .findMany({
             start: 0,
             limit: 10,
-            orderBy: { createdAt: "DESC" },
+            orderBy: { createdAt: 'DESC' },
           });
-
-        console.log("TRANSACTIONS", transactions);
 
         return ctx.send({
           success: true,
@@ -182,21 +203,19 @@ module.exports = createCoreController(
         console.error(error);
         return ctx.send({
           success: false,
-          message: "Error occurred when getting all transactions.",
+          message: 'Error occurred when getting all transactions.',
         });
       }
     },
     async completeTransaction(ctx) {
       try {
         const transactions = await strapi.db
-          .query("api::transaction-sell.transaction-sell")
+          .query('api::transaction-sell.transaction-sell')
           .findMany({
             start: 0,
             limit: 10,
-            orderBy: { createdAt: "DESC" },
+            orderBy: { createdAt: 'DESC' },
           });
-
-        console.log("TRANSACTIONS", transactions);
 
         return ctx.send({
           success: true,
@@ -206,7 +225,7 @@ module.exports = createCoreController(
         console.error(error);
         return ctx.send({
           success: false,
-          message: "Error occurred when getting all transactions.",
+          message: 'Error occurred when getting all transactions.',
         });
       }
     },

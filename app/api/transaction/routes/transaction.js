@@ -12,7 +12,7 @@ module.exports = {
     {
       method: 'PUT',
       path: '/transaction',
-      handler: 'api::transaction.transaction.endTransaction',
+      handler: 'api::transaction.transaction.updateTransaction',
       config: {
         auth: false,
         policies: [],

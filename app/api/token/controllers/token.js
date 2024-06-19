@@ -282,4 +282,66 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
       );
     }
   },
+  async change(ctx) {
+    const { usdc_address, client_address, amount } = ctx.request.body;
+
+    try {
+      const { data } = await axios.post(
+        'http://54.67.10.124:4000/transfer_change_demo',
+        {
+          usdc_address,
+          client_address,
+          amount,
+        },
+        {
+          headers: {},
+        }
+      );
+
+      return ctx.send({
+        ...data,
+        success: true,
+      });
+    } catch (e) {
+      console.log('ERROR', e);
+      return ctx.send(
+        {
+          success: false,
+        },
+        500
+      );
+    }
+  },
+  async burn(ctx) {
+    const { token_address, client_address, amount } = ctx.request.body;
+
+    console.log({ token_address, client_address, amount });
+    console.log('http://54.67.10.124:4000/burn_tokens');
+
+    try {
+      const { data } = await axios.post(
+        'http://54.67.10.124:4000/burn_tokens',
+        {
+          token_address,
+          client_address,
+          amount,
+        },
+        {
+          headers: {},
+        }
+      );
+
+      return ctx.send({
+        success: true,
+      });
+    } catch (e) {
+      console.log('ERROR', e);
+      return ctx.send(
+        {
+          success: false,
+        },
+        500
+      );
+    }
+  },
 }));

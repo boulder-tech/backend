@@ -4,13 +4,14 @@
   "info": {
     "singularName": "transaction-sell",
     "pluralName": "transaction-sells",
-    "displayName": "TransactionSell"
+    "displayName": "TransactionSell",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "attributes": {
-    "client": {
+    "client_id": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::client.client"
@@ -42,6 +43,12 @@
     },
     "price_sold": {
       "type": "float"
+    },
+    "amount_redeemed": {
+      "type": "float"
+    },
+    "network": {
+      "type": "string"
     }
   }
 }

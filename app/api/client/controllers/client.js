@@ -379,6 +379,9 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
       console.log(`environment`, environment);
 
       await this.updateClient({
+        name: attributes.nameFirst,
+        lastname: attributes.nameLast,
+        email: attributes.emailAddress,
         address:
           environment === 'development'
             ? web3.utils.toChecksumAddress(attributes.referenceId)
