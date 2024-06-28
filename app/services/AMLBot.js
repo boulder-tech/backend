@@ -1,6 +1,7 @@
 const axios = require("axios");
 
 const AML_BOT_API_URL = strapi.config.get("environments.amlBotApiUrl");
+const AML_BOT_FORM_ID = strapi.config.get("environments.amlBotFormId");
 
 class AMLBot {
   constructor({ token }) {
@@ -15,9 +16,17 @@ class AMLBot {
     return response.data;
   }
 
-  // async getFormURL(data) {
-  //   const response = await axios.post()
-  // }
+  async getFormURL(data) {
+    const response = await axios.post(
+      `${AML_BOT_API_URL}/forms/${AML_BOT_FORM_ID}/urls`,
+      data,
+      {
+        headers: { Authorization: `Token ${this.token}` },
+      }
+    );
+
+    return response.data;
+  }
 }
 
 module.exports = AMLBot;
