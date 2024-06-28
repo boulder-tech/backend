@@ -61,6 +61,9 @@
     },
     "form_token": {
       "type": "string"
+    },
+    "applicant_id": {
+      "type": "string"
     }
   }
 }
