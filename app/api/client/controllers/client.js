@@ -1,55 +1,55 @@
-"use strict";
+'use strict';
 
 /**
  * client controller
  */
 
-const AWS = require("aws-sdk");
-const axios = require("axios");
-const bcrypt = require("bcryptjs");
-const web3 = require("web3");
-const Persona = require("../../../services/Persona");
-const AMLBot = require("../../../services/AMLBot");
+const AWS = require('aws-sdk');
+const axios = require('axios');
+const bcrypt = require('bcryptjs');
+const web3 = require('web3');
+const Persona = require('../../../services/Persona');
+const AMLBot = require('../../../services/AMLBot');
 
 const {
   verifyJWT,
   generateRegistrationToken,
   verifyRegistrationToken,
-} = require("../../../utils/auth");
+} = require('../../../utils/auth');
 
-const { createCoreController } = require("@strapi/strapi").factories;
+const { createCoreController } = require('@strapi/strapi').factories;
 
-const accessKeyId = strapi.config.get("environments.aws.ses.accessKeyId", "");
+const accessKeyId = strapi.config.get('environments.aws.ses.accessKeyId', '');
 const secretAccessKey = strapi.config.get(
-  "environments.aws.ses.secretAccessKey",
-  ""
+  'environments.aws.ses.secretAccessKey',
+  ''
 );
 
-const aws_ses_email = strapi.config.get("environments.aws.ses.email", "");
-const region = strapi.config.get("environments.aws.region", "");
-const frontendURL = strapi.config.get("environments.frontendURL");
-const personaApiKey = strapi.config.get("environments.personaApiKey");
-const environment = strapi.config.get("environments.environment");
-const managerApiURL = strapi.config.get("environments.managerApiURL");
+const aws_ses_email = strapi.config.get('environments.aws.ses.email', '');
+const region = strapi.config.get('environments.aws.region', '');
+const frontendURL = strapi.config.get('environments.frontendURL');
+const personaApiKey = strapi.config.get('environments.personaApiKey');
+const environment = strapi.config.get('environments.environment');
+const managerApiURL = strapi.config.get('environments.managerApiURL');
 
-const AMLBotToken = strapi.config.get("environments.amlBotToken");
+const AMLBotToken = strapi.config.get('environments.amlBotToken');
 
 const persona_status = {
-  kyc_approved: "pending_review",
-  pending_review: "pending_onboarding",
-  approved: "kyc_approved",
-  created: "pending_onboarding",
+  kyc_approved: 'pending_review',
+  pending_review: 'pending_onboarding',
+  approved: 'kyc_approved',
+  created: 'pending_onboarding',
 };
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-module.exports = createCoreController("api::client.client", ({ strapi }) => ({
+module.exports = createCoreController('api::client.client', ({ strapi }) => ({
   async signup(ctx) {
     const { email, name, lastname, password, verified } = ctx.request.body;
 
-    const client = await strapi.db.query("api::client.client").findOne({
+    const client = await strapi.db.query('api::client.client').findOne({
       select: [],
       where: { email },
       //populate: { category: true },
@@ -62,7 +62,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       });
     } else {
       if (verified) {
-        await strapi.db.query("api::client.client").create({
+        await strapi.db.query('api::client.client').create({
           data: {
             email,
             name,
@@ -106,7 +106,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
               },
             },
             Subject: {
-              Data: "Welcome to Boulder Tech",
+              Data: 'Welcome to Boulder Tech',
             },
           },
           Source: aws_ses_email,
@@ -115,12 +115,12 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
         ses.sendEmail(params, (err, data) => {
           if (err) {
             console.error(
-              "Error al enviar el correo electrónico:",
+              'Error al enviar el correo electrónico:',
               err.message
             );
           } else {
             console.log(
-              "Correo electrónico enviado. ID del mensaje:",
+              'Correo electrónico enviado. ID del mensaje:',
               data.MessageId
             );
           }
@@ -136,7 +136,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   async login(ctx) {
     const { email, password } = ctx.request.body;
 
-    const client = await strapi.db.query("api::client.client").findOne({
+    const client = await strapi.db.query('api::client.client').findOne({
       select: [],
       where: { email },
     });
@@ -172,7 +172,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
     const { public_address: address } = ctx.request.body;
 
     const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
+      .query('api::public-address.public-address')
       .findOne({ select: [], where: { address } });
 
     if (existingAddress) {
@@ -181,20 +181,28 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       });
     }
 
-    const kyc = await this.createOneTimeLinkForKyc(address);
+    const { form_id, form_url, verification_id, form_token } =
+      await this.createAMLBotFormURL({
+        type: 'PERSON',
+        wallet_address: address,
+      });
 
-    console.log("KYC", kyc);
-
-    const { id } = await strapi.db.query("api::client.client").create({
-      data: { status: "created", kyc_url: kyc["one-time-link-short"] },
+    const { id } = await strapi.db.query('api::client.client').create({
+      data: {
+        status: 'created',
+        kyc_url: form_url,
+        form_id,
+        verification_id,
+        form_token,
+      },
     });
 
-    await strapi.db.query("api::public-address.public-address").create({
+    await strapi.db.query('api::public-address.public-address').create({
       data: { client: id, address },
     });
 
     return ctx.send({
-      kyc_url: kyc["one-time-link-short"],
+      kyc_url: form_url,
       success: true,
     });
   },
@@ -202,7 +210,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
     const { public_address: address, ...data } = ctx.request.body;
 
     const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
+      .query('api::public-address.public-address')
       .findOne({
         where: { address },
         populate: { client: true },
@@ -210,9 +218,9 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
 
     if (existingAddress) {
       console.log(existingAddress.client);
-      await strapi.db.query("api::client.client").update({
+      await strapi.db.query('api::client.client').update({
         where: { id: existingAddress.client.id },
-        data: { status: "pending_review", ...data },
+        data: { status: 'pending_review', ...data },
       });
 
       return ctx.send({
@@ -223,12 +231,12 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   async updateData(ctx) {
     const { address: main_address, ...data } = ctx.request.body;
 
-    console.log("CLIENT => UPDATE DATA");
-    console.log("main_address", main_address);
-    console.log("data", data);
+    console.log('CLIENT => UPDATE DATA');
+    console.log('main_address', main_address);
+    console.log('data', data);
 
     const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
+      .query('api::public-address.public-address')
       .findOne({
         where: { address: main_address },
         populate: { client: true },
@@ -236,16 +244,16 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
 
     const reviewStatus = data.status;
 
-    console.log("existingAddress", existingAddress);
+    console.log('existingAddress', existingAddress);
 
     if (existingAddress) {
-      await strapi.db.query("api::client.client").update({
+      await strapi.db.query('api::client.client').update({
         where: { id: existingAddress.client.id },
         data,
       });
     }
 
-    console.log("CLIENT => END!");
+    console.log('CLIENT => END!');
 
     return ctx.send({
       success: true,
@@ -254,10 +262,10 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   async getByPublicAddress(ctx) {
     const { address } = ctx.params;
 
-    console.log("GET BY PUBLIC ADDRESS", address);
+    console.log('GET BY PUBLIC ADDRESS', address);
 
     const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
+      .query('api::public-address.public-address')
       .findOne({
         where: { address },
         populate: { client: true },
@@ -286,19 +294,19 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   async generateOneTimeLinkForKyc(ctx) {
     const { public_address } = ctx.request.body;
     const templateId = strapi.config.get(
-      "environments.personaInquiryTemplateId"
+      'environments.personaInquiryTemplateId'
     );
     const persona = new Persona({ apiKey: personaApiKey });
 
     const data = {
       attributes: {
-        "inquiry-template-id": templateId,
+        'inquiry-template-id': templateId,
       },
     };
 
     const meta = {
-      "auto-create-account": true,
-      "auto-create-account-reference-id": public_address,
+      'auto-create-account': true,
+      'auto-create-account-reference-id': public_address,
     };
 
     const {
@@ -308,7 +316,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       meta,
     });
 
-    console.log("inquiryId", inquiryId);
+    console.log('inquiryId', inquiryId);
 
     const { meta: kyc } = await persona.generateOneTimeInquiryLink({
       inquiryId,
@@ -322,21 +330,21 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   },
   async createOneTimeLinkForKyc(public_address) {
     const templateId = strapi.config.get(
-      "environments.personaInquiryTemplateId"
+      'environments.personaInquiryTemplateId'
     );
     const persona = new Persona({ apiKey: personaApiKey });
 
     const data = {
       attributes: {
-        "inquiry-template-id": templateId,
+        'inquiry-template-id': templateId,
       },
     };
 
-    console.log("CREATING INQUIRY WITH REFERENCE ID ->", public_address);
+    console.log('CREATING INQUIRY WITH REFERENCE ID ->', public_address);
 
     const meta = {
-      "auto-create-account": true,
-      "auto-create-account-reference-id": public_address,
+      'auto-create-account': true,
+      'auto-create-account-reference-id': public_address,
     };
 
     const {
@@ -346,7 +354,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       meta,
     });
 
-    console.log("INQUIRY ID =>", inquiryId);
+    console.log('INQUIRY ID =>', inquiryId);
 
     const { meta: kyc } = await persona.generateOneTimeInquiryLink({
       inquiryId,
@@ -373,11 +381,11 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       },
     } = ctx.request.body;
 
-    console.log("INQUIRY NAME", name);
+    console.log('INQUIRY NAME', name);
 
-    if (name === "inquiry.started") {
+    if (name === 'inquiry.started') {
       console.log(`INQUIRY ${inquiryId} STARTED`);
-    } else if (name === "inquiry.completed") {
+    } else if (name === 'inquiry.completed') {
       console.log(`INQUIRY ${inquiryId} COMPLETED`);
       console.log(`environment`, environment);
 
@@ -386,12 +394,12 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
         lastname: attributes.nameLast,
         email: attributes.emailAddress,
         address:
-          environment === "development"
+          environment === 'development'
             ? web3.utils.toChecksumAddress(attributes.referenceId)
             : attributes.referenceId,
-        status: "pending_review",
+        status: 'pending_review',
       });
-    } else if (name === "inquiry.approved") {
+    } else if (name === 'inquiry.approved') {
       console.log(`INQUIRY ${inquiryId} APPROVED`);
       console.log(`environment`, environment);
       //Just for sandbox: 10 seconds before update client status to approved because it happens too fast at sandbox environment
@@ -400,13 +408,13 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       //TODO: whitelist user
 
       const address =
-        environment === "development"
+        environment === 'development'
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
       await this.updateClient({
         address,
-        status: "kyc_approved",
+        status: 'kyc_approved',
       });
 
       /*
@@ -414,11 +422,11 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
         .in(address)
         .emit('kyc-approved', { address, status: 'approved' });
       */
-    } else if (name === "inquiry.expired") {
+    } else if (name === 'inquiry.expired') {
       console.log(`INQUIRY ${inquiryId} EXPIRED: ANOTHER ONE BITES THE DUST`);
 
       const address =
-        environment === "development"
+        environment === 'development'
           ? web3.utils.toChecksumAddress(attributes.referenceId)
           : attributes.referenceId;
 
@@ -426,18 +434,18 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
 
       await this.updateClient({
         address,
-        kyc_url: kyc["one-time-link-short"],
-        status: "created",
+        kyc_url: kyc['one-time-link-short'],
+        status: 'created',
       });
 
       strapi.io.sockets
         .in(address)
-        .emit("kyc-expired", { address, status: "expired" });
+        .emit('kyc-expired', { address, status: 'expired' });
     } else {
       console.log(`INQUIRY ${inquiryId}: ANOTHER ONE BITES THE DUST`);
     }
 
-    console.log("ATTRIBUTES", JSON.stringify(attributes));
+    console.log('ATTRIBUTES', JSON.stringify(attributes));
 
     return ctx.send({
       success: true,
@@ -447,14 +455,14 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
     const { address, ...data } = clientData;
 
     const existingAddress = await strapi.db
-      .query("api::public-address.public-address")
+      .query('api::public-address.public-address')
       .findOne({
         where: { address },
         populate: { client: true },
       });
 
     if (existingAddress) {
-      await strapi.db.query("api::client.client").update({
+      await strapi.db.query('api::client.client').update({
         where: {
           id: existingAddress.client.id,
           status: { $eq: persona_status[data.status] },
@@ -466,8 +474,8 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
   async getAllKycApproved(ctx) {
     const { status } = ctx.params;
 
-    const clients = await strapi.db.query("api::client.client").findMany({
-      select: ["createdAt"],
+    const clients = await strapi.db.query('api::client.client').findMany({
+      select: ['createdAt'],
       where: { status },
       populate: { public_addresses: true },
     });
@@ -482,7 +490,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
 
     try {
       const response = await axios.post(
-        "http://13.52.53.143:4000/batch_register_identity",
+        'http://13.52.53.143:4000/batch_register_identity',
         payload,
         {
           headers: {
@@ -491,7 +499,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
         }
       );
 
-      console.log("RESPONSE", response);
+      console.log('RESPONSE', response);
 
       return ctx.send({
         success: true,
@@ -512,7 +520,7 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       await amlBot.getFormURL({
         applicant_id,
         external_applicant_id: wallet_address,
-        redirect_url: "https://app.bouldertech.fi/",
+        redirect_url: 'https://app.bouldertech.fi/',
       });
     console.log(form_url);
 
@@ -522,7 +530,18 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
       form_id,
       verification_id,
       form_token,
-      status: "created",
+      status: 'created',
     });
+  },
+  async createAMLBotFormURL({ type, wallet_address }) {
+    const amlBot = new AMLBot({ token: AMLBotToken });
+    const { applicant_id } = await amlBot.createApplicant({ type });
+    const kycForm = await amlBot.getFormURL({
+      applicant_id,
+      external_applicant_id: wallet_address,
+      redirect_url: 'https://app.bouldertech.fi/',
+    });
+
+    return kycForm;
   },
 }));
