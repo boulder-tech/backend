@@ -16,4 +16,6 @@ module.exports = ({ env }) => ({
   personaApiKey: env('PERSONA_API_KEY_SANDBOX'),
   personaApiURL: env('PERSONA_API_URL'),
   personaInquiryTemplateId: env('PERSONA_INQUIRY_TEMPLATE_ID'),
+  amlBotApiUrl: env('AML_BOT_API_URL'),
+  amlBotToken: env('AML_BOT_TOKEN'),
 });

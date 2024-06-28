@@ -85,7 +85,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
     if (protocol === 'ERC-20') {
       try {
         const response = await axios.post(
-          'http://54.67.10.124:8000/deploy_erc20',
+          'http://13.52.53.143:8000/deploy_erc20',
           {
             name,
             symbol,
@@ -133,7 +133,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
           });
 
           const response = await axios.post(
-            `http://54.67.10.124:${
+            `http://13.52.53.143:${
               chain === 'arbitrumSepolia' ? 4000 : 5000
             }/deploy_from_factory_one_account`,
             {
@@ -170,7 +170,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
       } else {
         try {
           const response = await axios.post(
-            `http://54.67.10.124:${
+            `http://13.52.53.143:${
               network === 'arbitrumSepolia' ? '4000' : '5000'
             }/deploy_one_account`, //was /deploy
             {
@@ -212,7 +212,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
 
     try {
       const response = await axios.post(
-        `http://54.67.10.124:${
+        `http://13.52.53.143:${
           network === 'arbitrumSepolia' ? '4000' : '5000'
         }/deploy_factory_one_account`,
         {
@@ -248,7 +248,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
 
     try {
       const { data } = await axios.post(
-        'http://54.67.10.124:4000/mint_tokens_demo',
+        'http://13.52.53.143:4000/mint_tokens_demo',
         {
           token_address,
           amount,
@@ -287,7 +287,7 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
 
     try {
       const { data } = await axios.post(
-        'http://54.67.10.124:4000/transfer_change_demo',
+        'http://13.52.53.143:4000/transfer_change_demo',
         {
           usdc_address,
           client_address,
@@ -316,11 +316,11 @@ module.exports = createCoreController('api::token.token', ({ strapi }) => ({
     const { token_address, client_address, amount } = ctx.request.body;
 
     console.log({ token_address, client_address, amount });
-    console.log('http://54.67.10.124:4000/burn_tokens');
+    console.log('http://13.52.53.143:4000/burn_tokens');
 
     try {
       const { data } = await axios.post(
-        'http://54.67.10.124:4000/burn_tokens',
+        'http://13.52.53.143:4000/burn_tokens',
         {
           token_address,
           client_address,

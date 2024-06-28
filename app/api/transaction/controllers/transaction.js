@@ -10,8 +10,15 @@ module.exports = createCoreController(
   'api::transaction.transaction',
   ({ strapi }) => ({
     async startTransaction(ctx) {
-      const { amount_stable, token, address, hash, type_stable, price_bid } =
-        ctx.request.body;
+      const {
+        amount_stable,
+        token,
+        address,
+        hash,
+        type_stable,
+        price_bid,
+        network,
+      } = ctx.request.body;
 
       const client = await this.getByPublicAddress(address);
 
@@ -27,6 +34,7 @@ module.exports = createCoreController(
           status,
           type_stable,
           price_bid,
+          network,
         },
       });
 

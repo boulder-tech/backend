@@ -132,11 +132,26 @@ module.exports = createCoreController('api::asset.asset', ({ strapi }) => ({
     if (resolution === '1d' || resolution === '1M') {
       let prices = [];
 
-      for (let i = 1; i <= 20; i++) {
+      for (let i = 1; i <= 50; i++) {
         prices.push(fetchHistoricalPrice({ name, range: i, resolution }));
       }
 
-      history = (await Promise.all(prices)).filter((price) => !!price);
+      const historyPrices = await Promise.all(prices);
+      const seenIds = new Set();
+
+      historyPrices.forEach((item) => {
+        if (
+          history.length < 30 &&
+          item &&
+          !!item.price &&
+          !seenIds.has(item.id)
+        ) {
+          history.push(item);
+          seenIds.add(item.id);
+        }
+      });
+
+      //history = historyPrices.filter((data) => !!data.price);
     } else
       history = await strapi.db.query('api::asset.asset').findMany({
         where: { name, resolution },

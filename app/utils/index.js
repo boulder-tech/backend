@@ -10,6 +10,7 @@ const fetchHistoricalPrice = async ({ name, range, resolution }) => {
       $and: [
         {
           name,
+          resolution: '8h',
         },
         {
           createdAt: {

@@ -479,7 +479,7 @@ module.exports = createCoreController('api::client.client', ({ strapi }) => ({
 
     try {
       const response = await axios.post(
-        'http://54.67.10.124:4000/batch_register_identity',
+        'http://13.52.53.143:4000/batch_register_identity',
         payload,
         {
           headers: {
