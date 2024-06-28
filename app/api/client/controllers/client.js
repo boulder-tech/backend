@@ -515,5 +515,14 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
         redirect_url: "https://app.bouldertech.fi/",
       });
     console.log(form_url);
+
+    await this.updateClient({
+      address: wallet_address,
+      kyc_url: form_url,
+      form_id,
+      verification_id,
+      form_token,
+      status: "created",
+    });
   },
 }));
