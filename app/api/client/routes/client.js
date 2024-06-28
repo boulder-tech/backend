@@ -108,5 +108,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "POST",
+      path: "/client/kyc/aml-bot-status",
+      handler: "api::client.client.AMLBotStatus",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

@@ -545,4 +545,12 @@ module.exports = createCoreController("api::client.client", ({ strapi }) => ({
 
     return { ...kycForm, applicant_id };
   },
+
+  async AMLBotStatus(ctx) {
+    console.log(ctx.request.body);
+
+    return ctx.send({
+      success: true,
+    });
+  },
 }));
