@@ -52,6 +52,15 @@
     },
     "client_erc3643_identity": {
       "type": "string"
+    },
+    "form_id": {
+      "type": "string"
+    },
+    "verification_id": {
+      "type": "string"
+    },
+    "form_token": {
+      "type": "string"
     }
   }
 }
